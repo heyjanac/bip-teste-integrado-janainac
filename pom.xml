@@ -1,0 +1,33 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>com.example</groupId>
+    <artifactId>bip-teste-integrado</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+    <packaging>pom</packaging>
+
+    <name>BIP Teste Integrado</name>
+    <description>Solução fullstack em camadas: EJB + Spring Boot + Angular</description>
+
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>3.2.5</version>
+        <relativePath/>
+    </parent>
+
+    <properties>
+        <java.version>17</java.version>
+        <jakarta.ejb.version>4.0.1</jakarta.ejb.version>
+        <jakarta.persistence.version>3.1.0</jakarta.persistence.version>
+        <jakarta.transaction.version>2.0.1</jakarta.transaction.version>
+    </properties>
+
+    <modules>
+        <module>ejb-module</module>
+        <module>backend-module</module>
+    </modules>
+
+</project>

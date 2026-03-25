@@ -1,0 +1,62 @@
+version: "3.9"
+
+# ─────────────────────────────────────────────────────────────────────────────
+# BIP Teste Integrado — Stack Fullstack
+#
+# Serviços:
+#   backend   → Spring Boot + H2 in-memory (porta 8080)
+#   frontend  → Angular 17 servido via nginx (porta 80 → exposto em 4200)
+#
+# Uso:
+#   docker compose up --build          # primeira vez / após mudanças
+#   docker compose up -d               # subir em background
+#   docker compose down                # parar e remover containers
+# ─────────────────────────────────────────────────────────────────────────────
+
+services:
+
+  # ───────────────────────────────────────────
+  # Backend — Spring Boot + H2 in-memory
+  # ───────────────────────────────────────────
+  backend:
+    build:
+      # Contexto na raiz: necessário para o Dockerfile acessar ejb-module/ e backend-module/
+      context: .
+      dockerfile: backend-module/Dockerfile
+    container_name: bip-backend
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    environment:
+      # Sobrescreve qualquer profile Spring ativo
+      SPRING_PROFILES_ACTIVE: docker
+      # JVM: limita memória no container
+      JAVA_OPTS: "-Xms256m -Xmx512m"
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:8080/actuator/health 2>/dev/null || wget -qO- http://localhost:8080/api/beneficios 2>/dev/null | grep -q '\\[' && exit 0 || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 45s
+
+  # ───────────────────────────────────────────
+  # Frontend — Angular 17 + nginx
+  # ───────────────────────────────────────────
+  frontend:
+    build:
+      context: frontend
+      dockerfile: Dockerfile
+    container_name: bip-frontend
+    restart: unless-stopped
+    ports:
+      - "4200:80"
+    depends_on:
+      backend:
+        condition: service_started
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:80 > /dev/null && exit 0 || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 20s
+
